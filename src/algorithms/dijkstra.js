@@ -1,20 +1,15 @@
 
 // initialized with grid (basically 2-d array with nodes, with attributes given in class)
 // also have startNode and finishNode for the search to run
-export function dijkstra(grid, startNode, finishNode) {
-  // returns the below visitedNodesInOrder which are all Nodes... TBU
+export async function dijkstra(grid, startNode, finishNode) {
   const visitedNodesInOrder = [];
-  // given we pick smallest distance node, start has distance 0 from INF
   startNode.distance = 0;
-  // initally all nodes are unvisited, including the start node (but we guarantee that the 
-  // start node is the first to get visited because its distance is 0)
-  const unvisitedNodes = getAllNodes(grid);
+  
+  const unvisitedNodes = await getAllNodes(grid);
   while (!!unvisitedNodes.length) {
-    // every time we have not visited all nodes, sort the nodes based on distance
     sortNodesByDistance(unvisitedNodes);
-    // takes the first value out of the array and returns
     const closestNode = unvisitedNodes.shift();
-    // If we encounter a wall, we skip it
+    if (closestNode.row === 10 && closestNode.col === 34) console.log(closestNode.isWall);
     if (closestNode.isWall) continue;
     // If the closest node is at a distance of infinity,
     // we must be trapped and should therefore stop.

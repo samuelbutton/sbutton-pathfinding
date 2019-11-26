@@ -5,27 +5,22 @@
   display: inline-block;
 }
 
-.node-finish {
-  background-color: red;
-}
 
-.node-start {
-  background-color: green;
-}
 
 /* the below should probably be scaled back */
 .node-visited {
-  animation-name: visitedAnimation;
+  background-color: rgba(0, 190, 218, 0.75);
+/*  animation-name: visitedAnimation;
   animation-duration: 1.5s;
   animation-timing-function: ease-out;
   animation-delay: 0;
   animation-direction: alternate;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
-  animation-play-state: running;
+  animation-play-state: running;*/
 }
 
-@keyframes visitedAnimation {
+/*@keyframes visitedAnimation {
   0% {
     transform: scale(0.3);
     background-color: rgba(0, 0, 66, 0.75);
@@ -44,7 +39,15 @@
   100% {
     transform: scale(1);
     background-color: rgba(0, 190, 218, 0.75);
-  }
+  }*/
+/*}*/
+
+.node-finish {
+  background-color: red;
+}
+
+.node-start {
+  background-color: green;
 }
 
 .node-wall {

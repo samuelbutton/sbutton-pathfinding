@@ -24,14 +24,11 @@ export default class Node extends Component {
       : '';
 
     return (
-      // ${.} is string interpolation of variables
-      // the methods defined call back to PV component
-      // triggers below are built into the div, but we define functions for them
       <div
         id={`node-${row}-${col}`}
         className={`node ${extraClassName}`}
-        onMouseDown={() => onMouseDown(row, col)}
-        onMouseEnter={() => onMouseEnter(row, col)}
+        onMouseDown={() => onMouseDown(row, col, isStart, isFinish)}
+        onMouseEnter={() => onMouseEnter(row, col, isStart, isFinish)}
         onMouseUp={() => onMouseUp()}></div>
     );
   }
