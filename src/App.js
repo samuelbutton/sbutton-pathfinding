@@ -2,12 +2,16 @@ import React from 'react';
 import './App.css';
 // import Draggable from './Draggable';
 import PathfindingVisualizer from './PathfindingVisualizer/PathfindingVisualizer'
+import SortingVisualizer from './SortingVisualizer/SortingVisualizer'
 
 function App() {
   return (
     // only work out of PathfindingVisualizer component
+    
+    	// <PathfindingVisualizer></PathfindingVisualizer>
     <div className="App">
-      <PathfindingVisualizer></PathfindingVisualizer>
+      
+      <SortingVisualizer></SortingVisualizer>
     </div>
   );
 }

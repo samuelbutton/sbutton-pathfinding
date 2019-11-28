@@ -4,8 +4,10 @@ import {dijkstra, getNodesInShortestPathOrder} from '../algorithms/dijkstra';
 
 import './PathfindingVisualizer.css';
 
+// add responsiveness of grid size to scale up and down with that of window
 const NUM_ROWS = 20;
 const NUM_COLS = 50;
+// can be removed if necessary
 const START_NODE_ROW = 10;
 const START_NODE_COL = 5;
 const FINISH_NODE_ROW = 10;
@@ -21,9 +23,8 @@ export default class PathfindingVisualizer extends Component {
       finishDragging: false,
       visualizationRunning: false,
       visualizationDisplayed: false,
-      // to be added, state with size-adjustability
-      // NUM_ROWS = 20;
-      // NUM_COLS = 50;
+      // numberOfRows: 20,
+      // numberOfCols: 50,
       startNodeRow: 10,
       startNodeCol: 5,
       finishNodeRow: 10,
@@ -139,34 +140,24 @@ export default class PathfindingVisualizer extends Component {
     if (this.state.visualizationRunning) return;
     await this.lockInteractions();
     const {grid} = this.state;
-    let newGrid = grid.slice();
+    // let newGrid = grid.slice();
     for (let row = 0; row < NUM_ROWS; row++) {
 	    for (let col = 0; col < NUM_COLS; col++) {
 	      const node = grid[row][col];
 	      
     	  node.distance = Infinity;
     	  node.previousNode = null;
-        // if animate
 	      if (node.isVisited && !node.isFinish && !node.isStart && !node.isWall) 
 	      	if (animate) document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
-        // now the display will be left alone
-        // what we need to do now is compare the nodes in the new visitedNodes in Order and set class to ...
-        // for others set the class to the above
-
         node.isVisited = false;
 	    }
   	}
     const startNode = grid[this.state.startNodeRow][this.state.startNodeCol];
     const finishNode = grid[this.state.finishNodeRow][this.state.finishNodeCol];
-    // probably need to refactor the code so that the newly calculated visitedNodesInOrder / 
-    // nodesInShortestPathOrder can be compared against the old lists of node, allowing for adjustment 
-    // of formatting for only those that need to be adjusted
     const visitedNodesInOrder = await dijkstra(grid, startNode, finishNode);
     if (!animate) {
       let tempVisited = new Array(NUM_ROWS).fill(false).map(() => new Array(NUM_COLS).fill(false));
-      for (let i = 0; i < visitedNodesInOrder.length; i++) {
-        const node = visitedNodesInOrder[i];
-        // document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
+      for (const node of visitedNodesInOrder) {
         tempVisited[node.row][node.col] = true;
       }
       for (let row = 0; row < NUM_ROWS; row++) {
@@ -182,25 +173,9 @@ export default class PathfindingVisualizer extends Component {
     if (!animate) {
       for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
         const node = nodesInShortestPathOrder[i];
-        // document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
         tempVisited[node.row][node.col] = true;
       }
     }
-    // if (!animate && nodesInShortestPathOrder !== null) {
-    //   let tempVisited = new Array(NUM_ROWS).fill(false).map(() => new Array(NUM_COLS).fill(false));
-    //   for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
-    //     const node = nodesInShortestPathOrder[i];
-    //     document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-shortest-path';
-    //     tempVisited[node.row][node.col] = true;
-    //   }
-    //   for (let row = 0; row < NUM_ROWS; row++) {
-    //     for (let col = 0; col < NUM_COLS; col++) {
-    //       const node = grid[row][col];
-    //       if (!tempVisited[row][col] && !node.isFinish && !node.isStart && !node.isWall) 
-    //         document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
-    //     }
-    //   }
-    // }
     await this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder, animate, tempVisited);
   }
 
@@ -225,7 +200,7 @@ export default class PathfindingVisualizer extends Component {
 
   	// the actual rendering process, every time we render we pull the below two variables from 
   	// the state of the componenent
-    const {grid, mouseIsPressed, visualizationRunning} = this.state;
+    const {grid, mouseIsPressed} = this.state;
     if (grid !== null) return (
     	// the below represents a React fragment, allows a component to return multiple elements 
       <>
