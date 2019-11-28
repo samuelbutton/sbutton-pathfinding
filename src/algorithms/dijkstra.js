@@ -1,6 +1,4 @@
 
-// initialized with grid (basically 2-d array with nodes, with attributes given in class)
-// also have startNode and finishNode for the search to run
 export async function dijkstra(grid, startNode, finishNode) {
   const visitedNodesInOrder = [];
   startNode.distance = 0;
@@ -10,20 +8,15 @@ export async function dijkstra(grid, startNode, finishNode) {
     sortNodesByDistance(unvisitedNodes);
     const closestNode = unvisitedNodes.shift();
     if (closestNode.isWall) continue;
-    // If the closest node is at a distance of infinity,
-    // we must be trapped and should therefore stop.
     if (closestNode.distance === Infinity) return visitedNodesInOrder;
     closestNode.isVisited = true;
     visitedNodesInOrder.push(closestNode);
-    // return in the case that we find our goal
     if (closestNode === finishNode) return visitedNodesInOrder;
-    // updates distanceTo neighbors of the closest node
     updateUnvisitedNeighbors(closestNode, grid);
   }
 }
 
 function sortNodesByDistance(unvisitedNodes) {
-  // sort, takes a compare function, which allows you to sort a list of objects based on the comparison of the two
   unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
 }
 
@@ -46,7 +39,6 @@ function getUnvisitedNeighbors(node, grid) {
 }
 
 function getAllNodes(grid) {
-  // jsut append all nodes of the grid to the below list
   const nodes = [];
   for (const row of grid) {
     for (const node of row) {
@@ -56,8 +48,6 @@ function getAllNodes(grid) {
   return nodes;
 }
 
-// Backtracks from the finishNode to find the shortest path.
-// Only works when called *after* the dijkstra method above.
 export function getNodesInShortestPathOrder(finishNode) {
   const nodesInShortestPathOrder = [];
   let currentNode = finishNode;
