@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 // import Draggable from './Draggable';
-import PathfindingVisualizer from './PathfindingVisualizer/PathfindingVisualizer'
+// import PathfindingVisualizer from './PathfindingVisualizer/PathfindingVisualizer'
 import SortingVisualizer from './SortingVisualizer/SortingVisualizer'
 
 function App() {
