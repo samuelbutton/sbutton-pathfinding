@@ -1,17 +1,18 @@
 
 export function getMergeSortAnimations(array) {
-  const animations = [];
-  if (array.length <= 1) return array;
-  const auxiliaryArray = array.slice();
-  mergeSortHelper(array, 0, array.length - 1, auxiliaryArray, animations);
-  return animations;
+  return getMergeSort(array, true);
 }
 
 export function getMergeSortArray(array) {
+  return getMergeSort(array, false);
+}
+
+function getMergeSort(array, returnAnimations) {
   const animations = [];
   if (array.length <= 1) return array;
   const auxiliaryArray = array.slice();
   mergeSortHelper(array, 0, array.length - 1, auxiliaryArray, animations);
+  if (returnAnimations) return animations;
   return array;
 }
 

@@ -1,10 +1,13 @@
 import React from 'react';
 import {getMergeSortAnimations, getMergeSortArray} from '../algorithms/mergesort.js';
 import {getQuickSortAnimations, getQuickSortArray} from '../algorithms/quicksort.js';
+import {getHeapSortAnimations, getHeapSortArray} from '../algorithms/heapsort.js';
 import './SortingVisualizer.css';
 
-const ANIMATION_SPEED_MS = 200;
-const NUMBER_OF_ARRAY_BARS = 30;
+// TODO: freeze functionality if a visualization is running
+
+const ANIMATION_SPEED_MS = 20;
+const NUMBER_OF_ARRAY_BARS = 100;
 const PRIMARY_COLOR = 'turquoise';
 const SECONDARY_COLOR = 'red';
 const TERTIARY_COLOR = 'green';
@@ -33,7 +36,6 @@ export default class SortingVisualizer extends React.Component {
     const animations = getMergeSortAnimations(this.state.array);
     for (let i = 0; i < animations.length; i++) {
       const arrayBars = document.getElementsByClassName('array-bar');
-      // if third entry
       const isColorChange = i % 3 !== 2;
       if (isColorChange) {
         const [barOneIdx, barTwoIdx] = animations[i];
@@ -52,6 +54,10 @@ export default class SortingVisualizer extends React.Component {
         }, i * ANIMATION_SPEED_MS);
       }
     }
+    setTimeout(() => {
+        const newArray = getMergeSortArray(this.state.array);
+        this.setState({array: newArray});
+    }, animations.length * ANIMATION_SPEED_MS);
   }
 
   quickSort() {
@@ -59,50 +65,69 @@ export default class SortingVisualizer extends React.Component {
     const animations = getQuickSortAnimations(auxArray);
     for (let i = 0; i < animations.length; i++) {
       const arrayBars = document.getElementsByClassName('array-bar');
-      // if third entry
       const [legend, barOneIdx, barTwoIdx] = animations[i];
-      // console.log(barTwoIdx);
-      // console.log(i);
-      if (legend === 1) {
+      let isPartitionChange = legend === 1;
+      if (isPartitionChange) {
         const barOneStyle = arrayBars[barOneIdx].style;
         setTimeout(() => {
           barOneStyle.backgroundColor = TERTIARY_COLOR;
         }, i * ANIMATION_SPEED_MS);
-      } else if (legend === 2) {
+      } else {
+        let isBarExchange = legend === 2;
+        let color = isBarExchange ? SECONDARY_COLOR : PRIMARY_COLOR;
         const barOneStyle = arrayBars[barOneIdx].style;
         const barTwoStyle = arrayBars[barTwoIdx].style;
         setTimeout(() => {
-          barOneStyle.backgroundColor = SECONDARY_COLOR;
-          barTwoStyle.backgroundColor = SECONDARY_COLOR;
+          barOneStyle.backgroundColor = color;
+          barTwoStyle.backgroundColor = color;
         }, i * ANIMATION_SPEED_MS);
+        if (isBarExchange)
+          setTimeout(() => {
+            let temp = barOneStyle.height;
+            barOneStyle.height = barTwoStyle.height;
+            barTwoStyle.height = temp;
+          }, i * ANIMATION_SPEED_MS);
+      }
+    }
+    setTimeout(() => {
+        const newArray = getQuickSortArray(auxArray);
+        this.setState({array: newArray});
+    }, animations.length * ANIMATION_SPEED_MS);
+  }
+
+  heapSort() {
+    let auxArray = this.state.array.slice()
+    const animations = getHeapSortAnimations(auxArray);
+    for (let i = 0; i < animations.length; i++) {
+      const arrayBars = document.getElementsByClassName('array-bar');
+      const [isBuild, barOneIdx, barTwoIdx] = animations[i];
+      let isHeapBuild = isBuild === 1, isBarExchange = i % 2 === 0;
+      let color;
+      if (isHeapBuild) color = isBarExchange ? TERTIARY_COLOR : PRIMARY_COLOR;
+      else color = isBarExchange ? SECONDARY_COLOR : PRIMARY_COLOR;
+      const barOneStyle = arrayBars[barOneIdx].style;
+      const barTwoStyle = arrayBars[barTwoIdx].style;
+      setTimeout(() => {
+        barOneStyle.backgroundColor = color;
+        barTwoStyle.backgroundColor = color;
+      }, i * ANIMATION_SPEED_MS);
+      if (isBarExchange)
         setTimeout(() => {
           let temp = barOneStyle.height;
           barOneStyle.height = barTwoStyle.height;
           barTwoStyle.height = temp;
         }, i * ANIMATION_SPEED_MS);
-      } else {
-        const barOneStyle = arrayBars[barOneIdx].style;
-        // console.log(barTwoIdx);
-        const barTwoStyle = arrayBars[barTwoIdx].style;
-        setTimeout(() => {
-          barOneStyle.backgroundColor = PRIMARY_COLOR;
-          barTwoStyle.backgroundColor = PRIMARY_COLOR;
-        }, i * ANIMATION_SPEED_MS); 
-      }
     }
-  }
-
-  heapSort() {
-    
+    setTimeout(() => {
+        const newArray = getHeapSortArray(auxArray);
+        this.setState({array: newArray});
+    }, animations.length * ANIMATION_SPEED_MS);
   }
 
   bubbleSort() {
     
   }
 
-  // NOTE: This method will only work if your sorting algorithms actually return
-  // the sorted arrays; if they return the animations (as they currently do), then
-  // this method will be broken.
   testSortingAlgorithms() {
     for (let i = 0; i < 100; i++) {
       const array = [];
@@ -113,7 +138,8 @@ export default class SortingVisualizer extends React.Component {
       const javaScriptSortedArray = array.slice().sort((a, b) => a - b);
       const mergeSortedArray = getMergeSortArray(array.slice());
       const quickSortedArray = getQuickSortArray(array.slice());
-      console.log(arraysAreEqual(javaScriptSortedArray, quickSortedArray));
+      const heapSortedArray = getHeapSortArray(array.slice());
+      console.log(arraysAreEqual(javaScriptSortedArray, heapSortedArray));
     }
   }
 
@@ -138,7 +164,7 @@ export default class SortingVisualizer extends React.Component {
         <button onClick={() => this.mergeSort()}>Merge Sort</button>
         <button onClick={() => this.quickSort()}>Quick Sort</button>
         <button onClick={() => this.heapSort()}>Heap Sort</button>
-        <button onClick={() => this.bubbleSort()}>Bubble Sort</button>
+        
         <button onClick={() => this.testSortingAlgorithms()}>
           Test Sorting Algorithms (BROKEN)
         </button>
@@ -147,6 +173,9 @@ export default class SortingVisualizer extends React.Component {
     );
   }
 }
+
+ // <button onClick={() => this.bubbleSort()}>Bubble Sort</button>
+
 
 // From https://stackoverflow.com/questions/4959975/generate-random-number-between-two-numbers-in-javascript
 function randomIntFromInterval(min, max) {
