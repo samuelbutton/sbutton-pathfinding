@@ -14,7 +14,7 @@ const FINISH_NODE_ROW = 10;
 const FINISH_NODE_COL = 45;
 
 export default class PathfindingVisualizer extends Component {
-  constructor() {
+  constructor(props) {
     super();
     this.state = {
       grid: [],
@@ -196,32 +196,15 @@ export default class PathfindingVisualizer extends Component {
   }
 
   render() {
-
-    // the actual rendering process, every time we render we pull the below two variables from 
-    // the state of the componenent
     const {grid, mouseIsPressed} = this.state;
     if (grid !== null) return (
-      // the below represents a React fragment, allows a component to return multiple elements 
       <>
-        <button className="menu-button" onClick={() => this.visualizeDijkstra(true)}>
-          
-        </button>
-        <button className="menu-button" onClick={() => this.clearVisualization()}>
-          
-        </button>
-        <button className="menu-button" onClick={() => this.clearVisualization()}>
-          
-        </button>
         <div className="grid">
-            {
-              grid.map((row, rowIdx) => {
-                // iterate across rows
+            {grid.map((row, rowIdx) => {
                 return (
                   <div key={rowIdx}>
                     {row.map((node, nodeIdx) => {
-                      // iterated accross nodes in the row
                       const {row, col, isFinish, isStart, isWall} = node;
-                  
                         return (
                         <Node
                           key={nodeIdx}
@@ -231,11 +214,9 @@ export default class PathfindingVisualizer extends Component {
                           isWall={isWall}
                           mouseIsPressed={mouseIsPressed}
                           onMouseDown={(row, col, isStart, isFinish) => this.handleMouseDown(row, col, isStart, isFinish)}
-                          onMouseEnter={(row, col, isStart, isFinish) =>
-                            this.handleMouseEnter(row, col, isStart, isFinish)
-                          }
+                          onMouseEnter={(row, col, isStart, isFinish) => this.handleMouseEnter(row, col, isStart, isFinish)}
                           onMouseUp={() => this.handleMouseUp()}
-                          row={row}></Node>
+                          row={row} />
                         );
                     })}
                   </div>
@@ -248,7 +229,6 @@ export default class PathfindingVisualizer extends Component {
   }
 }
 
-// constructs initial grid for the constructor
 const getInitialGrid = () => {
   const grid2 = [];
   for (let row = 0; row < NUM_ROWS; row++) {

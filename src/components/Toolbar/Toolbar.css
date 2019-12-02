@@ -18,10 +18,16 @@
 	margin-left: 1rem;
 }
 
-.toolbar_logo a{
+.toolbar_logo button{
 	color: white;
 	text-decoration: none;
 	font-size: 1.5rem;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	box-sizing: border-box;
+	outline: none;
 }
 
 .spacer {
@@ -41,13 +47,20 @@
 	padding: 0 0.5rem;
 }
 
-.toolbar_navigation-items a{
+.toolbar_navigation-items button{
 	color: white;
 	text-decoration: none;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	box-sizing: border-box;
+	font-size: .9rem;
+	outline: none;
 }
 
-.toolbar_navigation-items a:hover,
-.toolbar_navigation-items a:active {
+.toolbar_navigation-items button:hover,
+.toolbar_navigation-items button:active {
 	color: #fa923f;
 }
 

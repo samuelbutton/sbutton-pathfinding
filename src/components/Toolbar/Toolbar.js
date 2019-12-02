@@ -9,13 +9,13 @@ const toolbar = props => (
 			<div className="toolbar_toggle-button">
 				<DrawerToggleButton click={props.drawerClickHandler}/>
 			</div>
-			<div className="toolbar_logo"><a href="/">Pathfinding Visualizer</a></div>
+			<div className="toolbar_logo"><button onClick={props.clearClickHandler}>Pathfinding Visualizer</button></div>
 			
 			<div className="toolbar_navigation-items">
 				<ul>
-					<li><a href="/">Visualize Dijkstra's Algorithm</a></li>
-					<li><a href="/">Clear Walls</a></li>
-					<li><a href="/">Clear Visualization</a></li>
+					<li><button onClick={props.dijClickHandler}>Visualize Dijkstra's Algorithm</button></li>
+					<li><button onClick={props.clearClickHandler}>Clear Walls</button></li>
+					<li><button onClick={props.clearClickHandler}>Clear Visualization</button></li>
 				</ul>
 			</div>
 			<div className="spacer" />

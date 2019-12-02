@@ -7,8 +7,13 @@ import SideDrawer from '../SideDrawer/SideDrawer'
 import Backdrop from '../Backdrop/Backdrop'
 
 class App extends Component {
+	constructor(props) {
+		super(props);
+		this.pathfindElement = React.createRef();
+	}
+
 	state = {
-		sideDrawerOpen: false
+		sideDrawerOpen: false,
 	};
 
 	drawerToggleClickHandler = () => {
@@ -19,7 +24,12 @@ class App extends Component {
 	backdropClickHandler = () => {
 		this.setState({sideDrawerOpen: false});
 	};
-	
+	vizDijClickHandler = () => {
+		this.pathfindElement.current.visualizeDijkstra(true);
+	};
+	clearVizClickHandler = () => {
+		this.pathfindElement.current.clearVisualization();
+	};
 
 	render() {
 		let backdrop;
@@ -28,11 +38,13 @@ class App extends Component {
 		}
 		return (
 			<div className="App" style={{height: '100%'}}>
-			  <Toolbar drawerClickHandler={this.drawerToggleClickHandler} />
+			  <Toolbar drawerClickHandler={this.drawerToggleClickHandler} dijClickHandler={this.vizDijClickHandler} 
+			  clearClickHandler={this.clearVizClickHandler} />
 			  <SideDrawer show={this.state.sideDrawerOpen}/>
 			  {backdrop}
+			  
 			  <main style={{marginTop: '64px'}}>
-			  	<PathfindingVisualizer />
+			  	<PathfindingVisualizer ref={this.pathfindElement} />;
 			  </main>
 			</div>
 		);
