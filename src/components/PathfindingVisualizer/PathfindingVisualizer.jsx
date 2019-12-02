@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import Node from './Node/Node';
-import {dijkstra, getNodesInShortestPathOrder} from '../algorithms/dijkstra';
+import Node from '../Node/Node';
+import {dijkstra, getNodesInShortestPathOrder} from '../../algorithms/dijkstra';
 
 import './PathfindingVisualizer.css';
 
@@ -40,7 +40,7 @@ export default class PathfindingVisualizer extends Component {
 
   handleMouseDown(row, col, isStart, isFinish) {
     if (this.state.visualizationRunning) return;
-  	let newGrid;
+    let newGrid;
     if (!isStart && !isFinish) {
       newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
       this.setState({grid: newGrid, mouseIsPressed: true});
@@ -107,7 +107,7 @@ export default class PathfindingVisualizer extends Component {
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
          if (!node.isFinish && !node.isStart) {
-         	if (!animate && !tempVisited[node.row][node.col]) 
+          if (!animate && !tempVisited[node.row][node.col]) 
              document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
            else if (animate) document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
          }
@@ -116,7 +116,6 @@ export default class PathfindingVisualizer extends Component {
   }
 
   animateShortestPath(nodesInShortestPathOrder, animate) {
-  	// changes to 1 -> n-1 to leave first and last as is
     const delay = animate ? 100 : 0;
     if (nodesInShortestPathOrder.length === 1) {
       this.unlockInteractions();
@@ -142,16 +141,16 @@ export default class PathfindingVisualizer extends Component {
     const {grid} = this.state;
     // let newGrid = grid.slice();
     for (let row = 0; row < NUM_ROWS; row++) {
-	    for (let col = 0; col < NUM_COLS; col++) {
-	      const node = grid[row][col];
-	      
-    	  node.distance = Infinity;
-    	  node.previousNode = null;
-	      if (node.isVisited && !node.isFinish && !node.isStart && !node.isWall) 
-	      	if (animate) document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
+      for (let col = 0; col < NUM_COLS; col++) {
+        const node = grid[row][col];
+        
+        node.distance = Infinity;
+        node.previousNode = null;
+        if (node.isVisited && !node.isFinish && !node.isStart && !node.isWall) 
+          if (animate) document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
         node.isVisited = false;
-	    }
-  	}
+      }
+    }
     const startNode = grid[this.state.startNodeRow][this.state.startNodeCol];
     const finishNode = grid[this.state.finishNodeRow][this.state.finishNodeCol];
     const visitedNodesInOrder = await dijkstra(grid, startNode, finishNode);
@@ -181,46 +180,46 @@ export default class PathfindingVisualizer extends Component {
 
   clearVisualization() {
     if (this.state.visualizationRunning) return;
-  	const {grid} = this.state;
-  	for (let row = 0; row < NUM_ROWS; row++) {
-	    for (let col = 0; col < NUM_COLS; col++) {
-	      const node = grid[row][col];
-	      node.isWall = false;
-	      node.isVisited = false;
-    	  node.distance = Infinity;
-    	  node.previousNode = null;
-	      if (!node.isFinish && !node.isStart) 
-	      	document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
-	    }
-  	}
-  	this.setState({grid: grid, visualizationDisplayed: false});
+    const {grid} = this.state;
+    for (let row = 0; row < NUM_ROWS; row++) {
+      for (let col = 0; col < NUM_COLS; col++) {
+        const node = grid[row][col];
+        node.isWall = false;
+        node.isVisited = false;
+        node.distance = Infinity;
+        node.previousNode = null;
+        if (!node.isFinish && !node.isStart) 
+          document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
+      }
+    }
+    this.setState({grid: grid, visualizationDisplayed: false});
   }
 
   render() {
 
-  	// the actual rendering process, every time we render we pull the below two variables from 
-  	// the state of the componenent
+    // the actual rendering process, every time we render we pull the below two variables from 
+    // the state of the componenent
     const {grid, mouseIsPressed} = this.state;
     if (grid !== null) return (
-    	// the below represents a React fragment, allows a component to return multiple elements 
+      // the below represents a React fragment, allows a component to return multiple elements 
       <>
         <button className="menu-button" onClick={() => this.visualizeDijkstra(true)}>
-          Visualize Dijkstra's Algorithm
+          
         </button>
         <button className="menu-button" onClick={() => this.clearVisualization()}>
-          Clear Walls
+          
         </button>
         <button className="menu-button" onClick={() => this.clearVisualization()}>
-          Clear Visualization
+          
         </button>
         <div className="grid">
             {
               grid.map((row, rowIdx) => {
-              	// iterate across rows
+                // iterate across rows
                 return (
                   <div key={rowIdx}>
                     {row.map((node, nodeIdx) => {
-                    	// iterated accross nodes in the row
+                      // iterated accross nodes in the row
                       const {row, col, isFinish, isStart, isWall} = node;
                   
                         return (
@@ -264,7 +263,7 @@ const getInitialGrid = () => {
 
 // construct an individual node for adding to the grid
 const createNode = (col, row) => {
-	// TODO: replace with access of constructor? For Node component?
+  // TODO: replace with access of constructor? For Node component?
   return {
     col,
     row,

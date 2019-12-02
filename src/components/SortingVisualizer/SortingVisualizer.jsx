@@ -1,7 +1,7 @@
 import React from 'react';
-import {getMergeSortAnimations, getMergeSortArray} from '../algorithms/mergesort.js';
-import {getQuickSortAnimations, getQuickSortArray} from '../algorithms/quicksort.js';
-import {getHeapSortAnimations, getHeapSortArray} from '../algorithms/heapsort.js';
+import {getMergeSortAnimations, getMergeSortArray} from '../../algorithms/mergesort.js';
+import {getQuickSortAnimations, getQuickSortArray} from '../../algorithms/quicksort.js';
+import {getHeapSortAnimations, getHeapSortArray} from '../../algorithms/heapsort.js';
 import './SortingVisualizer.css';
 
 // TODO: freeze functionality if a visualization is running
@@ -176,10 +176,7 @@ export default class SortingVisualizer extends React.Component {
 
  // <button onClick={() => this.bubbleSort()}>Bubble Sort</button>
 
-
-// From https://stackoverflow.com/questions/4959975/generate-random-number-between-two-numbers-in-javascript
 function randomIntFromInterval(min, max) {
-  // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
