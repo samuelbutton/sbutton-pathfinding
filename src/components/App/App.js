@@ -28,7 +28,7 @@ class App extends Component {
 		this.pathfindElement.current.visualizeDijkstra(true);
 	};
 	clearVizClickHandler = () => {
-		this.pathfindElement.current.clearVisualization();
+		this.pathfindElement.current.clearVisualization(true);
 	};
 
 	render() {

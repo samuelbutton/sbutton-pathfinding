@@ -95,28 +95,22 @@ export default class PathfindingVisualizer extends Component {
       buttons[i].style.visibility = 'visible';
   }
 
-  animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder, animate, tempVisited) {
-    const delay = animate ? 5 : 0;
-    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
-      if (i === visitedNodesInOrder.length) {
-        setTimeout(() => {
-          this.animateShortestPath(nodesInShortestPathOrder, animate);
-        }, delay * i);
-        return;
-      }
+  animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder) {
+    const delay = 5;
+    let i = 0;
+    for (const node of visitedNodesInOrder) {
       setTimeout(() => {
-        const node = visitedNodesInOrder[i];
-         if (!node.isFinish && !node.isStart) {
-          if (!animate && !tempVisited[node.row][node.col]) 
-             document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
-           else if (animate) document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
-         }
-      }, delay * i);
+         if (!node.isFinish && !node.isStart)
+           document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
+      }, delay * i++);
     }
+    setTimeout(() => {
+          this.animateShortestPath(nodesInShortestPathOrder);
+    }, delay * visitedNodesInOrder.length);
   }
 
-  animateShortestPath(nodesInShortestPathOrder, animate) {
-    const delay = animate ? 100 : 0;
+  animateShortestPath(nodesInShortestPathOrder) {
+    const delay = 100;
     if (nodesInShortestPathOrder.length === 1) {
       this.unlockInteractions();
       return;
@@ -135,64 +129,80 @@ export default class PathfindingVisualizer extends Component {
     }
   }
 
-  async visualizeDijkstra(animate) {
-    if (this.state.visualizationRunning) return;
-    await this.lockInteractions();
-    const {grid} = this.state;
-    // let newGrid = grid.slice();
-    for (let row = 0; row < NUM_ROWS; row++) {
-      for (let col = 0; col < NUM_COLS; col++) {
-        const node = grid[row][col];
-        
-        node.distance = Infinity;
-        node.previousNode = null;
-        if (node.isVisited && !node.isFinish && !node.isStart && !node.isWall) 
-          if (animate) document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
-        node.isVisited = false;
-      }
+  animateArray(array, delay, classname) {
+    let i = 0;
+    for (const node of array) {
+      setTimeout(() => {
+         if (!node.isFinish && !node.isStart)
+           document.getElementById(`node-${node.row}-${node.col}`).className = classname;
+      }, delay * i++);
     }
-    const startNode = grid[this.state.startNodeRow][this.state.startNodeCol];
-    const finishNode = grid[this.state.finishNodeRow][this.state.finishNodeCol];
-    const visitedNodesInOrder = await dijkstra(grid, startNode, finishNode);
-    if (!animate) {
-      let tempVisited = new Array(NUM_ROWS).fill(false).map(() => new Array(NUM_COLS).fill(false));
-      for (const node of visitedNodesInOrder) {
-        tempVisited[node.row][node.col] = true;
-      }
-      for (let row = 0; row < NUM_ROWS; row++) {
-        for (let col = 0; col < NUM_COLS; col++) {
-          const node = grid[row][col];
-          if (!tempVisited[row][col] && !node.isFinish && !node.isStart && !node.isWall) 
-            document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
-        }
-      }
-    }
-    const nodesInShortestPathOrder = await getNodesInShortestPathOrder(finishNode);
-    let tempVisited = new Array(NUM_ROWS).fill(false).map(() => new Array(NUM_COLS).fill(false));
-    if (!animate) {
-      for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
-        const node = nodesInShortestPathOrder[i];
-        tempVisited[node.row][node.col] = true;
-      }
-    }
-    await this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder, animate, tempVisited);
   }
 
-  clearVisualization() {
-    if (this.state.visualizationRunning) return;
-    const {grid} = this.state;
-    for (let row = 0; row < NUM_ROWS; row++) {
-      for (let col = 0; col < NUM_COLS; col++) {
-        const node = grid[row][col];
-        node.isWall = false;
-        node.isVisited = false;
-        node.distance = Infinity;
-        node.previousNode = null;
-        if (!node.isFinish && !node.isStart) 
+  adjustExistingVisistedNodes(grid, visitedNodesInOrder) {
+    let tempVisited = new Array(NUM_ROWS).fill(false).map(() => new Array(NUM_COLS).fill(false));
+    for (const node of visitedNodesInOrder) {
+      tempVisited[node.row][node.col] = true;
+      if (!node.isFinish && !node.isStart) 
+        document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
+    }
+    for (const row of grid) {
+      for (const node of row) {
+        if (!tempVisited[node.row][node.col] && !node.isFinish && !node.isStart && !node.isWall) 
           document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
       }
     }
-    this.setState({grid: grid, visualizationDisplayed: false});
+  }
+
+  adjustExistingShortestNodes(grid, nodesInShortestPathOrder) {
+    for (const node in nodesInShortestPathOrder) {
+        if (node.isFinish || node.isStart) continue;
+        document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-shortest-path';
+    }
+  }
+
+
+  async visualizeDijkstra(animate) {
+    if (this.state.visualizationRunning) return;
+    await this.lockInteractions();
+    await this.clearVisualization(false, animate);
+    const {grid} = this.state;
+    const startNode = grid[this.state.startNodeRow][this.state.startNodeCol];
+    const finishNode = grid[this.state.finishNodeRow][this.state.finishNodeCol];
+    const visitedNodesInOrder = await dijkstra(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = await getNodesInShortestPathOrder(finishNode);
+
+    if (!animate) {
+      await this.adjustExistingVisistedNodes(grid, visitedNodesInOrder);
+      await this.adjustExistingShortestNodes(grid, nodesInShortestPathOrder);
+    } else {
+      await this.animateArray(visitedNodesInOrder, 5, 'node node-visited');
+      setTimeout(() => {
+         this.animateArray(nodesInShortestPathOrder, 80, 'node node-shortest-path');
+      }, 5 * visitedNodesInOrder.length);
+    }
+    this.unlockInteractions();
+  }
+
+  clearVisualization(clearWalls, animate) {
+    if (this.state.visualizationRunning) return;
+    const {grid} = this.state;
+    for (const row of grid) {
+      for (const node of row) {
+        if (clearWalls) {
+          node.isWall = false;
+          if (!node.isFinish && !node.isStart) 
+            document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
+        } else {
+            if (node.isVisited && !node.isFinish && !node.isStart && !node.isWall && animate) 
+              document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
+        }
+        node.isVisited = false;
+        node.distance = Infinity;
+        node.previousNode = null;
+      }
+    }
+    if (clearWalls) this.setState({grid: grid, visualizationDisplayed: false});
   }
 
   render() {
