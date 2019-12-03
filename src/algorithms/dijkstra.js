@@ -48,7 +48,7 @@ function getAllNodes(grid) {
   return nodes;
 }
 
-export function getNodesInShortestPathOrder(finishNode) {
+export function getDijkstraShortestPathOrder(finishNode) {
   const nodesInShortestPathOrder = [];
   let currentNode = finishNode;
   while (currentNode !== null) {

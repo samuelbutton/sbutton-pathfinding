@@ -25,7 +25,7 @@ class App extends Component {
 		this.setState({sideDrawerOpen: false});
 	};
 	vizDijClickHandler = () => {
-		this.pathfindElement.current.visualizeDijkstra(true);
+		this.pathfindElement.current.visualizeAlgorithm(true);
 	};
 	clearVizClickHandler = () => {
 		this.pathfindElement.current.clearVisualization(true);
