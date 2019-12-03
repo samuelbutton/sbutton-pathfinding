@@ -44,7 +44,7 @@ class App extends Component {
 			  {backdrop}
 			  
 			  <main style={{marginTop: '64px'}}>
-			  	<PathfindingVisualizer ref={this.pathfindElement} />;
+			  	<PathfindingVisualizer className='pathViz' ref={this.pathfindElement} />
 			  </main>
 			</div>
 		);

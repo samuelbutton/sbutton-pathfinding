@@ -14,12 +14,16 @@
 	padding: 0 1rem;
 }
 
+.toolbar_navigation button{
+	color: white;
+}
+
 .toolbar_logo {
 	margin-left: 1rem;
 }
 
 .toolbar_logo button{
-	color: white;
+	/*color: white;*/
 	text-decoration: none;
 	font-size: 1.5rem;
 	background: transparent;
@@ -48,7 +52,6 @@
 }
 
 .toolbar_navigation-items button{
-	color: white;
 	text-decoration: none;
 	background: transparent;
 	border: none;

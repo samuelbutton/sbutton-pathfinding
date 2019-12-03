@@ -1,21 +1,20 @@
 import React, {Component} from 'react';
 import Node from '../Node/Node';
 import {dijkstra, getNodesInShortestPathOrder} from '../../algorithms/dijkstra';
+// import {depthFirst, getNodesInShortestPathOrder} from '../../algorithms/depthFirst';
 
 import './PathfindingVisualizer.css';
 
-// add responsiveness of grid size to scale up and down with that of window
-const NUM_ROWS = 20;
-const NUM_COLS = 50;
-// can be removed if necessary
-const START_NODE_ROW = 10;
-const START_NODE_COL = 5;
-const FINISH_NODE_ROW = 10;
-const FINISH_NODE_COL = 45;
+const NODE_WIDTH = 25;
+const NODE_HEIGHT= 25;
+let START_NODE_COL, START_NODE_ROW, FINISH_NODE_ROW, FINISH_NODE_COL;
 
 export default class PathfindingVisualizer extends Component {
   constructor(props) {
     super();
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+    const [numRows, numCols] = this.updateGridDimensions();
+    this.updateEndCoordinates(numRows, numCols);
     this.state = {
       grid: [],
       mouseIsPressed: false,
@@ -23,53 +22,88 @@ export default class PathfindingVisualizer extends Component {
       finishDragging: false,
       visualizationRunning: false,
       visualizationDisplayed: false,
-      // numberOfRows: 20,
-      // numberOfCols: 50,
-      startNodeRow: 10,
-      startNodeCol: 5,
-      finishNodeRow: 10,
-      finishNodeCol: 45
+      numberOfRows: numRows,
+      numberOfCols: numCols,
+      startNodeRow: START_NODE_ROW,
+      startNodeCol: START_NODE_COL, 
+      finishNodeRow: FINISH_NODE_ROW,
+      finishNodeCol: FINISH_NODE_COL
     };
   }
 
-  componentDidMount() {
-    const grid = getInitialGrid();
-    this.setState({grid});
+  updateGridDimensions() {
+    let newDimensions = [];
+    newDimensions.push(Math.floor((window.innerHeight-100)/NODE_HEIGHT));
+    newDimensions.push(Math.floor((window.innerWidth-60)/NODE_WIDTH));
+    return newDimensions;
   }
 
+  updateEndCoordinates(numRows, numCols) {
+    START_NODE_COL = Math.floor(numCols*0.1);
+    START_NODE_ROW = Math.floor(numRows*0.5);
+    FINISH_NODE_COL = Math.floor(numCols*0.90);
+    FINISH_NODE_ROW = Math.floor(numRows*0.5);
+  }
 
-  handleMouseDown(row, col, isStart, isFinish) {
+  componentDidMount() {
+    let initGrid = [];
+    const grid = getInitialGrid(initGrid, this.state.numberOfRows, this.state.numberOfCols);
+    this.setState({grid});
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions);
+  }
+
+  updateWindowDimensions() {
     if (this.state.visualizationRunning) return;
+    let numRows = Math.floor((window.innerHeight-100)/NODE_HEIGHT);
+    let numCols = Math.floor((window.innerWidth-60)/NODE_WIDTH);
+    this.updateEndCoordinates(numRows, numCols);
+    this.setState({ 
+      numberOfRows: numRows, 
+      numberOfCols: numCols,
+      startNodeRow: START_NODE_ROW,
+      startNodeCol: START_NODE_COL, 
+      finishNodeRow: FINISH_NODE_ROW,
+      finishNodeCol: FINISH_NODE_COL
+    });
+    const grid = getInitialGrid(this.state.grid, this.state.numberOfRows, this.state.numberOfCols);
+    grid[START_NODE_ROW][START_NODE_COL].isWall = false;
+    grid[FINISH_NODE_ROW][FINISH_NODE_COL].isWall = false;
+    this.setState({grid: grid});
+    if (this.state.visualizationDisplayed) this.visualizeDijkstra(false);
+  }
+
+  handleMouseDown(row, col) {
+    if (this.state.visualizationRunning) return;
+    const {grid} = this.state;
     let newGrid;
-    if (!isStart && !isFinish) {
-      newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
+    if (!grid[row][col].isStart && !grid[row][col].isFinish) {
+      newGrid = getNewGridWithWallToggled(grid, row, col);
       this.setState({grid: newGrid, mouseIsPressed: true});
       if (this.state.visualizationDisplayed) this.visualizeDijkstra(false);
     }
-    else if (isStart) {
+    else if (grid[row][col].isStart) {
       this.setState({mouseIsPressed: true, startDragging: true});
     } else {
       this.setState({mouseIsPressed: true, finishDragging: true});
     }
   }
 
-  handleMouseEnter(row, col, isStart, isFinish) {
+  handleMouseEnter(row, col) {
     if (!this.state.mouseIsPressed || this.state.visualizationRunning) return;
-
+    const {grid} = this.state;
+    if (grid[row][col].isStart || grid[row][col].isFinish) return;
     let newGrid;
-
-    if (this.state.startDragging || this.state.finishDragging) {
-      if (this.state.startDragging) {
-        newGrid = getNewGridWithEndAdjusted(this.state.grid, row, col, this.state.startNodeRow, 
+    if (this.state.startDragging) {
+        newGrid = getNewGridWithEndAdjusted(grid, row, col, this.state.startNodeRow, 
           this.state.startNodeCol, true);
         this.setState({grid: newGrid, startNodeRow: row, startNodeCol: col});
-      } else {
-        newGrid = getNewGridWithEndAdjusted(this.state.grid, row, col, this.state.finishNodeRow, 
+    } else if (this.state.finishDragging) {
+        newGrid = getNewGridWithEndAdjusted(grid, row, col, this.state.finishNodeRow, 
           this.state.finishNodeCol, false);
         this.setState({grid: newGrid, finishNodeRow: row, finishNodeCol: col});
-      }
-    } else if (!isStart && !isFinish) {
-      newGrid = getNewGridWithWallToggled(this.state.grid, row, col, this.state.visualizationDisplayed);
+    } else {
+      newGrid = getNewGridWithWallToggled(grid, row, col, this.state.visualizationDisplayed);
       this.setState({grid: newGrid});
     }
     if (this.state.visualizationDisplayed) this.visualizeDijkstra(false);
@@ -81,51 +115,25 @@ export default class PathfindingVisualizer extends Component {
 
   lockInteractions() {
     this.setState({visualizationRunning: true, visualizationDisplayed: true});
-    let buttons = document.getElementsByClassName("menu-button")
-    let i = 0;
-    for (i; i < buttons.length; i++)
-      buttons[i].style.visibility = 'hidden';
+    const buttons = document.getElementsByTagName("button");
+    for (const button of buttons)
+      button.style.color = 'yellow';
+    const grids = document.getElementsByClassName('grid');
+    for (const grid of grids) {
+      grid.style['min-height'] = "" + (NODE_HEIGHT * this.state.numberOfRows) + "px";
+      grid.style['min-width'] = "" + (NODE_WIDTH * this.state.numberOfCols) + "px";
+    }
   }
 
   unlockInteractions() {
     this.setState({visualizationRunning: false});
-    let buttons = document.getElementsByClassName("menu-button")
-    let i = 0;
-    for (i; i < buttons.length; i++)
-      buttons[i].style.visibility = 'visible';
-  }
-
-  animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder) {
-    const delay = 5;
-    let i = 0;
-    for (const node of visitedNodesInOrder) {
-      setTimeout(() => {
-         if (!node.isFinish && !node.isStart)
-           document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited';
-      }, delay * i++);
-    }
-    setTimeout(() => {
-          this.animateShortestPath(nodesInShortestPathOrder);
-    }, delay * visitedNodesInOrder.length);
-  }
-
-  animateShortestPath(nodesInShortestPathOrder) {
-    const delay = 100;
-    if (nodesInShortestPathOrder.length === 1) {
-      this.unlockInteractions();
-      return;
-    }
-    for (let i = 1; i < nodesInShortestPathOrder.length - 1; i++) {
-      setTimeout(() => {
-        const node = nodesInShortestPathOrder[i];
-         document.getElementById(`node-${node.row}-${node.col}`).className =
-          'node node-shortest-path';
-      }, delay * i);
-      if (i === nodesInShortestPathOrder.length - 2)   {
-        setTimeout(() => {
-          this.unlockInteractions();
-        }, delay * i);
-      }
+    const buttons = document.getElementsByTagName("button");
+    for (const button of buttons)
+      button.style.color = 'white';
+    const grids = document.getElementsByClassName('grid');
+    for (const grid of grids) {
+      grid.style['min-height'] = "";
+      grid.style['min-width'] = "";
     }
   }
 
@@ -140,7 +148,8 @@ export default class PathfindingVisualizer extends Component {
   }
 
   adjustExistingVisistedNodes(grid, visitedNodesInOrder) {
-    let tempVisited = new Array(NUM_ROWS).fill(false).map(() => new Array(NUM_COLS).fill(false));
+    if (visitedNodesInOrder === undefined) return;
+    let tempVisited = new Array(this.state.numberOfRows).fill(false).map(() => new Array(this.state.numberOfCols).fill(false));
     for (const node of visitedNodesInOrder) {
       tempVisited[node.row][node.col] = true;
       if (!node.isFinish && !node.isStart) 
@@ -155,33 +164,64 @@ export default class PathfindingVisualizer extends Component {
   }
 
   adjustExistingShortestNodes(grid, nodesInShortestPathOrder) {
-    for (const node in nodesInShortestPathOrder) {
-        if (node.isFinish || node.isStart) continue;
-        document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-shortest-path';
+    if (nodesInShortestPathOrder === undefined) return;
+    for (const node of nodesInShortestPathOrder) {
+        if (!node.isFinish && !node.isStart) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-shortest-path';
+        }
     }
   }
 
+  async visualizeAlgo(animate, getAllNodes, getShortestPathNodes) {
+    if (this.state.visualizationRunning) return;
+    await this.clearVisualization(false, animate);
+    await this.lockInteractions();
+    const {grid, startNodeRow, startNodeCol, finishNodeRow, finishNodeCol} = this.state;
+    const startNode = grid[startNodeRow][startNodeCol];
+    const finishNode = grid[finishNodeRow][finishNodeCol];
+    const visitedNodesInOrder = await getAllNodes(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = await getShortestPathNodes(finishNode);
+
+    if (!animate) {
+      await this.adjustExistingVisistedNodes(grid, visitedNodesInOrder);
+      await this.adjustExistingShortestNodes(grid, nodesInShortestPathOrder);
+      this.unlockInteractions();
+    } else {
+      const visitedDelay = 5, shortestDelay = 20;
+      await this.animateArray(visitedNodesInOrder, visitedDelay, 'node node-visited');
+      setTimeout(() => {
+         this.animateArray(nodesInShortestPathOrder, shortestDelay, 'node node-shortest-path');
+         setTimeout(() => {
+           this.unlockInteractions();
+         }, shortestDelay * nodesInShortestPathOrder.length);
+      }, visitedDelay * visitedNodesInOrder.length);
+    } 
+  }
 
   async visualizeDijkstra(animate) {
     if (this.state.visualizationRunning) return;
-    await this.lockInteractions();
     await this.clearVisualization(false, animate);
-    const {grid} = this.state;
-    const startNode = grid[this.state.startNodeRow][this.state.startNodeCol];
-    const finishNode = grid[this.state.finishNodeRow][this.state.finishNodeCol];
+    await this.lockInteractions();
+    const {grid, startNodeRow, startNodeCol, finishNodeRow, finishNodeCol} = this.state;
+    const startNode = grid[startNodeRow][startNodeCol];
+    const finishNode = grid[finishNodeRow][finishNodeCol];
     const visitedNodesInOrder = await dijkstra(grid, startNode, finishNode);
     const nodesInShortestPathOrder = await getNodesInShortestPathOrder(finishNode);
 
     if (!animate) {
       await this.adjustExistingVisistedNodes(grid, visitedNodesInOrder);
       await this.adjustExistingShortestNodes(grid, nodesInShortestPathOrder);
+      this.unlockInteractions();
     } else {
-      await this.animateArray(visitedNodesInOrder, 5, 'node node-visited');
+      const visitedDelay = 5, shortestDelay = 80;
+      await this.animateArray(visitedNodesInOrder, visitedDelay, 'node node-visited');
       setTimeout(() => {
-         this.animateArray(nodesInShortestPathOrder, 80, 'node node-shortest-path');
-      }, 5 * visitedNodesInOrder.length);
-    }
-    this.unlockInteractions();
+         this.animateArray(nodesInShortestPathOrder, shortestDelay, 'node node-shortest-path');
+         setTimeout(() => {
+           this.unlockInteractions();
+         }, shortestDelay * nodesInShortestPathOrder.length);
+      }, visitedDelay * visitedNodesInOrder.length);
+    } 
   }
 
   clearVisualization(clearWalls, animate) {
@@ -189,15 +229,16 @@ export default class PathfindingVisualizer extends Component {
     const {grid} = this.state;
     for (const row of grid) {
       for (const node of row) {
+        node.isVisited = false;
         if (clearWalls) {
           node.isWall = false;
           if (!node.isFinish && !node.isStart) 
             document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
         } else {
-            if (node.isVisited && !node.isFinish && !node.isStart && !node.isWall && animate) 
+            if (!node.isFinish && !node.isStart && !node.isWall && animate) {
               document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
+            }
         }
-        node.isVisited = false;
         node.distance = Infinity;
         node.previousNode = null;
       }
@@ -223,8 +264,8 @@ export default class PathfindingVisualizer extends Component {
                           isStart={isStart}
                           isWall={isWall}
                           mouseIsPressed={mouseIsPressed}
-                          onMouseDown={(row, col, isStart, isFinish) => this.handleMouseDown(row, col, isStart, isFinish)}
-                          onMouseEnter={(row, col, isStart, isFinish) => this.handleMouseEnter(row, col, isStart, isFinish)}
+                          onMouseDown={(row, col) => this.handleMouseDown(row, col)}
+                          onMouseEnter={(row, col) => this.handleMouseEnter(row, col)}
                           onMouseUp={() => this.handleMouseUp()}
                           row={row} />
                         );
@@ -239,17 +280,25 @@ export default class PathfindingVisualizer extends Component {
   }
 }
 
-const getInitialGrid = () => {
-  const grid2 = [];
-  for (let row = 0; row < NUM_ROWS; row++) {
+const getInitialGrid = (grid, rows, cols) => {
+  // refactor to use given grid
+  let oldCols;
+  let newGrid = [];
+  const oldRows = grid.length;
+  if (oldRows > 0) oldCols = grid[0].length;
+  else oldCols = 0;
+  for (let row = 0; row < rows; row++) {
     const currentRow = [];
-    for (let col = 0; col < NUM_COLS; col++) {
-      currentRow.push(createNode(col, row));
+    for (let col = 0; col < cols; col++) {
+      let node = createNode(col, row);
+      if (row < oldRows && col < oldCols && grid[row][col].isWall)
+        node.isWall = true;
+      currentRow.push(node);
     }
-    grid2.push(currentRow);
+    newGrid.push(currentRow);
   }
-  return grid2;
-};
+  return newGrid;
+}
 
 // construct an individual node for adding to the grid
 const createNode = (col, row) => {
@@ -279,25 +328,17 @@ const getNewGridWithWallToggled = (grid, row, col) => {
   return newGrid;
 };
 
-// TODO - refactor below two methods to combine
 const getNewGridWithEndAdjusted = (grid, row, col, oldRow, oldCol, startOrFinish) => {
   const newGrid = grid.slice();
   const node = newGrid[row][col];
-  let newNode;
-  if (startOrFinish) {
-    newNode = {
+  let newNode = {
       ...node,
       isWall: false,
-      isStart: true,
     };
-  } else {
-    newNode = {
-      ...node,
-      isWall: false,
-      isFinish: true,
-    };
-  }
+  if (startOrFinish) newNode.isStart = true;
+  else newNode.isFinish = true;
   newGrid[row][col] = newNode;
+
   const oldEndNode = newGrid[oldRow][oldCol];
   const newEndNode = {
     ...oldEndNode,

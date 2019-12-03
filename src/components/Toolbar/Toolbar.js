@@ -14,7 +14,6 @@ const toolbar = props => (
 			<div className="toolbar_navigation-items">
 				<ul>
 					<li><button onClick={props.dijClickHandler}>Visualize Dijkstra's Algorithm</button></li>
-					<li><button onClick={props.clearClickHandler}>Clear Walls</button></li>
 					<li><button onClick={props.clearClickHandler}>Clear Visualization</button></li>
 				</ul>
 			</div>

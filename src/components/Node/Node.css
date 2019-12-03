@@ -10,6 +10,8 @@
 /* the below should probably be scaled back */
 .node-visited {
   background-color: rgba(0, 190, 218, 0.75);
+
+}
 /*  animation-name: visitedAnimation;
   animation-duration: 1.5s;
   animation-timing-function: ease-out;
@@ -18,7 +20,7 @@
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
   animation-play-state: running;*/
-}
+
 
 /*@keyframes visitedAnimation {
   0% {
