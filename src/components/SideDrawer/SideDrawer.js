@@ -7,13 +7,23 @@ const sideDrawer = props => {
 	if (props.show) {
 		drawerClasses = 'side-drawer open';
 	}
+	let initalValue = '[Choose Algorithm]';
+	if (props.selection !== undefined) initalValue = props.selection;
 	return (
 		<nav className={drawerClasses}>
-		<ul>
-			<li><a href="/">Products</a></li>
-			<li><a href="/">Users</a></li>
-		</ul>
-	</nav>
+			<ul>
+				<li>
+					<select onChange={props.changeHandler} value={initalValue}>
+						<option className="initialSelection" value="init">[Choose Algorithm]</option>
+						<option value="dijkstra">Dijkstra</option>
+						<option value="bfs">Breadth-first</option>
+						<option value="dfs">Depth-first</option>
+					</select>
+				</li>
+				<li><button onClick={props.vizClickHandler}>Visualize!</button></li>
+				<li><button onClick={props.clearClickHandler}>Clear Visualization</button></li>
+			</ul>
+		</nav>
 	);
 };
 

@@ -1,14 +1,18 @@
 import React, {Component} from 'react';
 import Node from '../Node/Node';
-import {dijkstra, getDijkstraShortestPathOrder} from '../../algorithms/dijkstra';
-// import {depthFirst, getNodesInShortestPathOrder} from '../../algorithms/depthFirst';
+import Alert from '../Alert/Alert';
+import {dijkstra} from '../../algorithms/dijkstra';
+import {dfs} from '../../algorithms/dfs';
+import {bfs} from '../../algorithms/bfs';
 
 import './PathfindingVisualizer.css';
 
 const NODE_WIDTH = 25;
 const NODE_HEIGHT= 25;
+let alertHandler;
 
 export default class PathfindingVisualizer extends Component {
+  
   constructor(props) {
     super();
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
@@ -24,8 +28,10 @@ export default class PathfindingVisualizer extends Component {
       numberOfCols: numCols,
       startNode: undefined,
       finishNode: undefined,
-      algorithm: 'dijkstra'
+      algorithm: undefined,
+      showAlertBox: false
     };
+    alertHandler = props.alertHandler;
   }
 
   updateGridDimensions() {
@@ -121,26 +127,34 @@ export default class PathfindingVisualizer extends Component {
   lockInteractions() {
     this.setState({visualizationRunning: true, visualizationDisplayed: true});
     const {numberOfRows, numberOfCols} = this.state;
-    const buttons = document.getElementsByTagName("button");
-    for (const button of buttons)
-      button.style.color = 'yellow';
-    const grids = document.getElementsByClassName('grid');
-    for (const grid of grids) {
-      grid.style['min-height'] = "" + (NODE_HEIGHT * numberOfRows) + "px";
-      grid.style['min-width'] = "" + (NODE_WIDTH * numberOfCols) + "px";
-    }
+    const clearButtons = document.getElementsByClassName("clearButton");
+    for (const button of clearButtons)
+      button.style.color = '#fa923f';
+    const select = document.getElementsByClassName("selector")[0];
+    select.style.color = '#fa923f';
+    select.disabled = true;
+    const grid = document.getElementsByClassName('grid')[0];
+    grid.style['min-height'] = "" + (NODE_HEIGHT * numberOfRows) + "px";
+    grid.style['min-width'] = "" + (NODE_WIDTH * numberOfCols) + "px";
+    const vizButton = document.getElementsByClassName('vizButton')[0];
+    vizButton.style.color = '#521751';
   }
 
   unlockInteractions() {
     this.setState({visualizationRunning: false});
-    const buttons = document.getElementsByTagName("button");
-    for (const button of buttons)
+    const clearButtons = document.getElementsByClassName("clearButton");
+    for (const button of clearButtons)
       button.style.color = 'white';
-    const grids = document.getElementsByClassName('grid');
-    for (const grid of grids) {
-      grid.style['min-height'] = "";
-      grid.style['min-width'] = "";
+    const selectors = document.getElementsByClassName("selector");
+    for (const selector of selectors) {   
+      selector.style.color = 'white';
+      selector.disabled = false;
     }
+    const grid = document.getElementsByClassName('grid')[0];
+    grid.style['min-height'] = "";
+    grid.style['min-width'] = "";
+    const vizButton = document.getElementsByClassName('vizButton')[0];
+    vizButton.style.color = '#521751';
   }
 
   animateArray(array, delay, classname) {
@@ -179,16 +193,44 @@ export default class PathfindingVisualizer extends Component {
     }
   }
 
+  setAlgorithm(algorithm) {
+    switch (algorithm) {
+      case 'dijkstra':
+        this.setState({algorithm: dijkstra});
+        break;
+      case 'dfs':
+        this.setState({algorithm: dfs});
+        break;
+      case 'bfs':
+        this.setState({algorithm: bfs});
+        break;
+      default:
+        this.setState({showAlertBox: true});
+        return;
+    }
+    this.clearVisualization(false);
+    const initSelection = document.getElementsByClassName('initialSelection');
+    initSelection[0].style.display = 'none';
+    const vizButton = document.getElementsByClassName('vizButton');
+    vizButton[0].style.background = 'yellow';
+    vizButton[0].style.color = '#521751';
+    const selection = document.getElementsByClassName('selector');
+    selection[0].style.color = 'white';
+  }
+
   async visualizeAlgorithm(animate) {
-    if (this.state.visualizationRunning || this.state.algorithm === undefined) return;
+    if (this.state.visualizationRunning) return;
+    if (this.state.algorithm === undefined) {
+      alertHandler();
+      this.setAlgorithm();
+      return;
+    }
     await this.clearVisualization(false, animate);
     await this.lockInteractions();
     const {grid, startNode, finishNode, algorithm} = this.state;
     const visitedDelay = 5, shortestDelay = 20;
-    const getAllNodes = await this.getAllNodesAlgo(algorithm);
-    const getShortestPathNodes = await this.getShortNodesAlgo(algorithm);
-    const visitedNodesInOrder = await getAllNodes(grid, startNode, finishNode);
-    const nodesInShortestPathOrder = await getShortestPathNodes(finishNode);
+    const visitedNodesInOrder = await algorithm(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = await getShortestPathOrder(finishNode);
 
     if (!animate) {
       await this.adjustExistingVisistedNodes(grid, visitedNodesInOrder);
@@ -203,14 +245,6 @@ export default class PathfindingVisualizer extends Component {
          }, shortestDelay * nodesInShortestPathOrder.length);
       }, visitedDelay * visitedNodesInOrder.length);
     } 
-  }
-
-  getAllNodesAlgo(algorithm) {
-    return dijkstra;
-  }
-
-  getShortNodesAlgo(algorithm) {
-    return getDijkstraShortestPathOrder;
   }
 
   clearVisualization(clearWalls, animate) {
@@ -235,10 +269,18 @@ export default class PathfindingVisualizer extends Component {
     if (clearWalls) this.setState({grid, visualizationDisplayed: false});
   }
 
+  alertCloseHandler = () => {
+    alertHandler();
+    this.setState({showAlertBox: false});
+  };
+
   render() {
-    const {grid, mouseIsPressed} = this.state;
+    const {grid, mouseIsPressed, showAlertBox} = this.state;
+    let alertBox;
+    if (showAlertBox) alertBox = <Alert click={this.alertCloseHandler}/>
     if (grid !== null) return (
       <>
+         {alertBox}
         <div className="grid">
             {grid.map((row, rowIdx) => {
                 return (
@@ -288,7 +330,6 @@ const getNewGrid = (grid, rows, cols) => {
   return newGrid;
 }
 
-// construct an individual node for adding to the grid
 const createNode = (col, row) => {
   return {
     col,
@@ -300,4 +341,14 @@ const createNode = (col, row) => {
     isWall: false,
     previousNode: null,
   };
-};
+}
+
+const getShortestPathOrder = (finishNode) => {
+  const nodesInShortestPathOrder = [];
+  let currentNode = finishNode;
+  while (currentNode !== null) {
+    nodesInShortestPathOrder.unshift(currentNode);
+    currentNode = currentNode.previousNode;
+  }
+  return nodesInShortestPathOrder;
+}

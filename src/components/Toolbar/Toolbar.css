@@ -14,7 +14,7 @@
 	padding: 0 1rem;
 }
 
-.toolbar_navigation button{
+.toolbar_navigation, .selector, button{
 	color: white;
 }
 
@@ -23,7 +23,6 @@
 }
 
 .toolbar_logo button{
-	/*color: white;*/
 	text-decoration: none;
 	font-size: 1.5rem;
 	background: transparent;
@@ -51,19 +50,23 @@
 	padding: 0 0.5rem;
 }
 
-.toolbar_navigation-items button{
+.toolbar_navigation-items, .selector,  button{
 	text-decoration: none;
 	background: transparent;
+	border-radius: 0.25rem;
 	border: none;
 	cursor: pointer;
-	padding: 0;
+	padding: 0.5rem;
 	box-sizing: border-box;
 	font-size: .9rem;
 	outline: none;
 }
 
+
 .toolbar_navigation-items button:hover,
-.toolbar_navigation-items button:active {
+.toolbar_navigation-items button:active,
+.toolbar_navigation-items select:hover,
+.toolbar_navigation-items select:active {
 	color: #fa923f;
 }
 

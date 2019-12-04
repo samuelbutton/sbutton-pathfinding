@@ -1,0 +1,49 @@
+.alert-box {
+	margin: 0 auto;
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 999;
+	background: #521751;
+	padding: 30px 40px 30px;
+	border-radius: 8px;
+	text-align: center;
+	vertical-align: center;
+	color: white;
+}
+
+.alert-button {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	height: 24px;
+	width: 30px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+.alert-button:focus {
+	outline: none;
+}
+
+.alert-button_line {
+	position: fixed;
+	top: 0;
+	left: 0;
+	margin: 10px 5px;
+	width: 15px;
+	height: 2px;
+	background: white;
+	transform: rotate(45deg);
+}
+.left {
+	transform: rotate(45deg);
+}
+.right {
+	transform: rotate(135deg);
+}

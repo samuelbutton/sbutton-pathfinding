@@ -47,14 +47,3 @@ function getAllNodes(grid) {
   }
   return nodes;
 }
-
-export function getDijkstraShortestPathOrder(finishNode) {
-  const nodesInShortestPathOrder = [];
-  let currentNode = finishNode;
-  while (currentNode !== null) {
-    // adds to front the next node
-    nodesInShortestPathOrder.unshift(currentNode);
-    currentNode = currentNode.previousNode;
-  }
-  return nodesInShortestPathOrder;
-}

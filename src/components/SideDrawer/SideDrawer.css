@@ -28,14 +28,19 @@
 	margin: 0.5rem 0;
 }
 
-.side-drawer a{
+.side-drawer button, select{
 	color: #521751;
 	text-decoration: none;
 	font-size: 1.2rem;
+	background: none;
+	border: none;
+	outline: none;
 }
 
-.side-drawer a:hover,
-.side-drawer a:active{
+.side-drawer button:hover,
+.side-drawer select:hover,
+.side-drawer select:active,
+.side-drawer button:active{
 	color: #fa923f;
 }
 

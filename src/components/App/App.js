@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
 import PathfindingVisualizer from '../PathfindingVisualizer/PathfindingVisualizer'
-// import SortingVisualizer from './components/SortingVisualizer/SortingVisualizer'
 import Toolbar from '../Toolbar/Toolbar'
 import SideDrawer from '../SideDrawer/SideDrawer'
 import Backdrop from '../Backdrop/Backdrop'
@@ -14,6 +13,8 @@ class App extends Component {
 
 	state = {
 		sideDrawerOpen: false,
+		alertOpen: false,
+		selection: undefined
 	};
 
 	drawerToggleClickHandler = () => {
@@ -21,37 +22,55 @@ class App extends Component {
 			return {sideDrawerOpen: !prevState.sideDrawerOpen};
 		});
 	};
+	alertToggleHandler = (adjustSideDrawer) => {
+		if (adjustSideDrawer) {
+			this.setState((prevState) => {
+				return {sideDrawerOpen: !prevState.sideDrawerOpen};
+			});
+		} else {
+			this.setState((prevState) => {
+				return {alertOpen: !prevState.alertOpen};
+			});
+		}
+	};
 	backdropClickHandler = () => {
 		this.setState({sideDrawerOpen: false});
+		if (this.state.alertOpen) this.pathfindElement.current.alertCloseHandler();
 	};
-	vizDijClickHandler = () => {
+	visualClickHandler = () => {
+		this.setState({sideDrawerOpen: false, alertOpen: false});
 		this.pathfindElement.current.visualizeAlgorithm(true);
 	};
 	clearVizClickHandler = () => {
+		this.setState({sideDrawerOpen: false, alertOpen: false});
 		this.pathfindElement.current.clearVisualization(true);
+	};
+	selectionChangeHandler = (event) => {
+		this.pathfindElement.current.setAlgorithm(event.target.value);
+		this.setState({selection: event.target.value});
 	};
 
 	render() {
 		let backdrop;
-		if (this.state.sideDrawerOpen) {
+		if (this.state.sideDrawerOpen || this.state.alertOpen) {
 			backdrop = <Backdrop click={this.backdropClickHandler}/>;
 		}
 		return (
 			<div className="App" style={{height: '100%'}}>
-			  <Toolbar drawerClickHandler={this.drawerToggleClickHandler} dijClickHandler={this.vizDijClickHandler} 
-			  clearClickHandler={this.clearVizClickHandler} />
-			  <SideDrawer show={this.state.sideDrawerOpen}/>
+			  <Toolbar drawerClickHandler={this.drawerToggleClickHandler} vizClickHandler={this.visualClickHandler} 
+			  clearClickHandler={this.clearVizClickHandler} changeHandler={this.selectionChangeHandler}/>
+			  <SideDrawer show={this.state.sideDrawerOpen} vizClickHandler={this.visualClickHandler} 
+			  clearClickHandler={this.clearVizClickHandler} changeHandler={this.selectionChangeHandler}
+			  selection={this.state.selection} />
 			  {backdrop}
 			  
 			  <main style={{marginTop: '64px'}}>
-			  	<PathfindingVisualizer className='pathViz' ref={this.pathfindElement} />
+			  	<PathfindingVisualizer className='pathViz' ref={this.pathfindElement} 
+			  	alertHandler={this.alertToggleHandler} />
 			  </main>
 			</div>
 		);
 	}
 }
-
-// <SortingVisualizer></SortingVisualizer>
-// 
 
 export default App;
