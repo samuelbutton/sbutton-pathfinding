@@ -12,10 +12,7 @@ function search(grid, visitedNodesInOrder, candidates) {
     const node = candidates.shift();
     visitedNodesInOrder.push(node);
     node.isVisited = true;
-    if (node.isFinish) {
-      candidates = [];
-      break;
-    }
+    if (node.isFinish) break;
     const unvisitedNeighbors = getUnvisitedNeighbors(node, grid);
     // shuffle(unvisitedNeighbors);
     for (const neighbor of unvisitedNeighbors) {

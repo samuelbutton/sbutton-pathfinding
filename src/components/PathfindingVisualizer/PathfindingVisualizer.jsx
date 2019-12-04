@@ -4,6 +4,7 @@ import Alert from '../Alert/Alert';
 import {dijkstra} from '../../algorithms/dijkstra';
 import {dfs} from '../../algorithms/dfs';
 import {bfs} from '../../algorithms/bfs';
+import {aStar} from '../../algorithms/aStar';
 
 import './PathfindingVisualizer.css';
 
@@ -198,6 +199,9 @@ export default class PathfindingVisualizer extends Component {
       case 'dijkstra':
         this.setState({algorithm: dijkstra});
         break;
+      case 'aStar':
+        this.setState({algorithm: aStar});
+        break;
       case 'dfs':
         this.setState({algorithm: dfs});
         break;
@@ -266,7 +270,8 @@ export default class PathfindingVisualizer extends Component {
         node.previousNode = null;
       }
     }
-    if (clearWalls) this.setState({grid, visualizationDisplayed: false});
+    this.setState({grid});
+    if (clearWalls) this.setState({visualizationDisplayed: false});
   }
 
   alertCloseHandler = () => {
