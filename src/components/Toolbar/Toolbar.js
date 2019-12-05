@@ -30,6 +30,8 @@ const toolbar = props => (
 				</ul>
 			</div>
 			<div className="spacer" />
+			<a href="https://github.com/scbutton95/sbutton-pathfinding" class="button
+      github-button">View on Github</a>
 		</nav>
 	</header>
 	);

@@ -14,15 +14,20 @@
 	padding: 0 1rem;
 }
 
-.toolbar_navigation, .selector, button{
+.toolbar_navigation, .selector, button, a{
 	color: white;
+}
+
+a:visited{ 
+	color: white;
+	text-decoration: none;
 }
 
 .toolbar_logo {
 	margin-left: 1rem;
 }
 
-.toolbar_logo button{
+.toolbar_logo button, a{
 	text-decoration: none;
 	font-size: 1.5rem;
 	background: transparent;
@@ -50,7 +55,7 @@
 	padding: 0 0.5rem;
 }
 
-.toolbar_navigation-items, .selector,  button{
+.toolbar_navigation-items, .selector,  button, a{
 	text-decoration: none;
 	background: transparent;
 	border-radius: 0.25rem;
@@ -71,7 +76,7 @@
 }
 
 @media (max-width: 768px) {
-	.toolbar_navigation-items {
+	.toolbar_navigation-items, a {
 		display: none;
 	}
 }
