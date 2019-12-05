@@ -6,6 +6,7 @@ import {dfs} from '../../algorithms/dfs';
 import {bfs} from '../../algorithms/bfs';
 import {aStar} from '../../algorithms/aStar';
 import {bidirectional} from '../../algorithms/bidirectionalBfs';
+import {bestFirst} from '../../algorithms/bestFirst';
 
 import './PathfindingVisualizer.css';
 
@@ -203,6 +204,9 @@ export default class PathfindingVisualizer extends Component {
         break;
       case 'aStar':
         this.setState({algorithm: aStar});
+        break;
+      case 'bestFirst':
+        this.setState({algorithm: bestFirst});
         break;
       case 'dfs':
         this.setState({algorithm: dfs});

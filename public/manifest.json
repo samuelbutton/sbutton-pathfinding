@@ -1,6 +1,6 @@
 {
-  "short_name": "Viz App",
-  "name": "Visualization App",
+  "short_name": "Pathfinding",
+  "name": "Pathfinding App",
   "icons": [
     {
       "src": "favicon.ico",

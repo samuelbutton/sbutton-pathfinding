@@ -1,5 +1,3 @@
-
-
 export async function aStar(grid, startNode, finishNode) {
   const visitedNodesInOrder = [];
   const candidates = new Array(getNumberOfNodes(grid));

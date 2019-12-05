@@ -18,6 +18,7 @@ const toolbar = props => (
 							<option className="initialSelection" value="init">[Choose Algorithm]</option>
 							<option value="dijkstra">Dijkstra</option>
 							<option value="aStar">A* Manhattan</option>
+							<option value="aStar">Best-first</option>
 							<option value="bfs">Breadth-first</option>
 							<option value="bidirectional">Bidirectional BFS</option>
 							<option value="dfs">Depth-first</option>
