@@ -13,8 +13,9 @@ function search(grid, visitedNodesInOrder, candidates, startNode, finishNode) {
   let N = insert(startNode, candidates, 0);
   while (candidates.length !== 0) {
     const node = delMin(candidates, N--);
+    if (node === undefined || node === null) break;
     visitedNodesInOrder.push(node);
-    if (node !== null && node.isFinish) break;
+    if (node.isFinish) break;
     const unvisitedNeighbors = getUnvisitedNeighbors(node, grid);
 
     for (const neighbor of unvisitedNeighbors) {
