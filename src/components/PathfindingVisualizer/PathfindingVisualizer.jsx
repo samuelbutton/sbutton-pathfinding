@@ -5,11 +5,13 @@ import {dijkstra} from '../../algorithms/dijkstra';
 import {dfs} from '../../algorithms/dfs';
 import {bfs} from '../../algorithms/bfs';
 import {aStar} from '../../algorithms/aStar';
+import {bidirectional} from '../../algorithms/bidirectionalBfs';
 
 import './PathfindingVisualizer.css';
 
 const NODE_WIDTH = 25;
 const NODE_HEIGHT= 25;
+const VISIT_DELAY = 5, SHORTEST_DELAY = 20;
 let alertHandler;
 
 export default class PathfindingVisualizer extends Component {
@@ -208,6 +210,9 @@ export default class PathfindingVisualizer extends Component {
       case 'bfs':
         this.setState({algorithm: bfs});
         break;
+      case 'bidirectional':
+        this.setState({algorithm: bidirectional});
+        break;
       default:
         this.setState({showAlertBox: true});
         return;
@@ -232,7 +237,7 @@ export default class PathfindingVisualizer extends Component {
     await this.clearVisualization(false, animate);
     await this.lockInteractions();
     const {grid, startNode, finishNode, algorithm} = this.state;
-    const visitedDelay = 5, shortestDelay = 20;
+    
     const visitedNodesInOrder = await algorithm(grid, startNode, finishNode);
     const nodesInShortestPathOrder = await getShortestPathOrder(finishNode);
 
@@ -241,13 +246,13 @@ export default class PathfindingVisualizer extends Component {
       await this.adjustExistingShortestNodes(grid, nodesInShortestPathOrder);
       this.unlockInteractions();
     } else {
-      await this.animateArray(visitedNodesInOrder, visitedDelay, 'node node-visited');
+      await this.animateArray(visitedNodesInOrder, VISIT_DELAY, 'node node-visited');
       setTimeout(() => {
-         this.animateArray(nodesInShortestPathOrder, shortestDelay, 'node node-shortest-path');
+         this.animateArray(nodesInShortestPathOrder, SHORTEST_DELAY, 'node node-shortest-path');
          setTimeout(() => {
            this.unlockInteractions();
-         }, shortestDelay * nodesInShortestPathOrder.length);
-      }, visitedDelay * visitedNodesInOrder.length);
+         }, SHORTEST_DELAY * nodesInShortestPathOrder.length);
+      }, VISIT_DELAY * visitedNodesInOrder.length);
     } 
   }
 
@@ -268,6 +273,9 @@ export default class PathfindingVisualizer extends Component {
         }
         node.distance = Infinity;
         node.previousNode = null;
+        node.nextNode = null;
+        node.isFinVisited = false;
+        node.moves = 0;
       }
     }
     this.setState({grid});
@@ -345,6 +353,9 @@ const createNode = (col, row) => {
     isVisited: false,
     isWall: false,
     previousNode: null,
+    nextNode: null,
+    moves: 0,
+    isFinVisited: false
   };
 }
 

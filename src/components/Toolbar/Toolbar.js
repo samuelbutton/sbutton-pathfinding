@@ -17,8 +17,9 @@ const toolbar = props => (
 						<select className="selector" onChange={props.changeHandler}>
 							<option className="initialSelection" value="init">[Choose Algorithm]</option>
 							<option value="dijkstra">Dijkstra</option>
-							<option value="aStar">A*</option>
+							<option value="aStar">A* Manhattan</option>
 							<option value="bfs">Breadth-first</option>
+							<option value="bidirectional">Bidirectional BFS</option>
 							<option value="dfs">Depth-first</option>
 						</select>
 					</li>

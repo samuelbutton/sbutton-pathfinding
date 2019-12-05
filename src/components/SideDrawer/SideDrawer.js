@@ -16,7 +16,9 @@ const sideDrawer = props => {
 					<select onChange={props.changeHandler} value={initalValue}>
 						<option className="initialSelection" value="init">[Choose Algorithm]</option>
 						<option value="dijkstra">Dijkstra</option>
+						<option value="aStar">A* Manhattan</option>
 						<option value="bfs">Breadth-first</option>
+						<option value="bidirectional">Bidirectional BFS</option>
 						<option value="dfs">Depth-first</option>
 					</select>
 				</li>
