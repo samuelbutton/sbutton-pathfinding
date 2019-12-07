@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Node from '../Node/Node';
 import Alert from '../Alert/Alert';
+import Guide from '../Guide/Guide';
 import {dijkstra} from '../../algorithms/dijkstra';
 import {dfs} from '../../algorithms/dfs';
 import {bfs} from '../../algorithms/bfs';
@@ -33,7 +34,8 @@ export default class PathfindingVisualizer extends Component {
       startNode: undefined,
       finishNode: undefined,
       algorithm: undefined,
-      showAlertBox: false
+      showAlertBox: false,
+      showGuideBox: true
     };
     alertHandler = props.alertHandler;
   }
@@ -290,14 +292,19 @@ export default class PathfindingVisualizer extends Component {
     alertHandler();
     this.setState({showAlertBox: false});
   };
+  guideCloseHandler = () => {
+    this.setState({showGuideBox: false});
+  };
 
   render() {
-    const {grid, mouseIsPressed, showAlertBox} = this.state;
-    let alertBox;
-    if (showAlertBox) alertBox = <Alert click={this.alertCloseHandler}/>
+    const {grid, mouseIsPressed, showAlertBox, showGuideBox} = this.state;
+    let alertBox, guideBox;
+    if (showAlertBox) alertBox = <Alert click={this.alertCloseHandler}/>;
+    if (showGuideBox) guideBox = <Guide click={this.guideCloseHandler}/>;
     if (grid !== null) return (
       <>
          {alertBox}
+         {guideBox}
         <div className="grid">
             {grid.map((row, rowIdx) => {
                 return (
