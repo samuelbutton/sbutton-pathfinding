@@ -50,7 +50,7 @@ class App extends Component {
 		this.setState({selection: event.target.value});
 	};
 	mazeGenerateHandler = (event) => {
-		// this.setState({sideDrawerOpen: false, alertOpen: false});
+		this.setState({sideDrawerOpen: false});
 		this.pathfindElement.current.generateMaze();
 	};
 
