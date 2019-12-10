@@ -49,6 +49,10 @@ class App extends Component {
 		this.pathfindElement.current.setAlgorithm(event.target.value);
 		this.setState({selection: event.target.value});
 	};
+	mazeGenerateHandler = (event) => {
+		// this.setState({sideDrawerOpen: false, alertOpen: false});
+		this.pathfindElement.current.generateMaze();
+	};
 
 	render() {
 		let backdrop;
@@ -58,10 +62,11 @@ class App extends Component {
 		return (
 			<div className="App" style={{height: '100%'}}>
 			  <Toolbar drawerClickHandler={this.drawerToggleClickHandler} vizClickHandler={this.visualClickHandler} 
-			  clearClickHandler={this.clearVizClickHandler} changeHandler={this.selectionChangeHandler}/>
+			  clearClickHandler={this.clearVizClickHandler} changeHandler={this.selectionChangeHandler} 
+			  mazeHandler={this.mazeGenerateHandler}/>
 			  <SideDrawer show={this.state.sideDrawerOpen} vizClickHandler={this.visualClickHandler} 
 			  clearClickHandler={this.clearVizClickHandler} changeHandler={this.selectionChangeHandler}
-			  selection={this.state.selection} />
+			  selection={this.state.selection} mazeHandler={this.mazeGenerateHandler}/>
 			  {backdrop}
 			  
 			  <main style={{marginTop: '64px'}}>

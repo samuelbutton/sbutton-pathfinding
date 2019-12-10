@@ -1,79 +1,73 @@
-export function generateMax(grid, startNode, finishNode) {
+export function maze(grid, startNode, finishNode) {
 	const walls = [];
-	for (let i = 0; i < array.length; i++) {
-		for (let j = 0; j < array[0].length; j++) {
-			if (i === 0 || j === 0) {
-				const node = array[i][j];
+	for (let row of grid) {
+		for (let node of row) {
+			if (node.row === 0 || node.col === 0 || node.row === grid.length - 1 || node.col === grid[0].length - 1) {
 				if (!node.isStart && !node.isFinish) {
 					node.isWall = true;
-					walls.push([i, j]);
+					walls.push(node);
 				}				
 			}
 		} 
 	}
-	const isHorizontal = choose_orientation(array[0].length, array.length);
-	divide(grid, nx, ny, w, h, isHorizontal, startNode, finishNode)
-
-
-	let wallVisited = new Array(array.length).fill(false).map(() => new Array(array[0].length).fill(false));
+	const isHorizontal = choose_orientation(grid[0].length - 2, grid.length - 2);
+	divide(grid, 1, 1, grid[0].length - 2, grid.length - 2, isHorizontal, startNode, finishNode, walls)
 	
-	return walls;
+	return [grid, walls];
 }
 
 function getX(width, startNode, finishNode, isWall) {
 	const addWall = isWall ? 2 : 0;
-	const line = getWall(width - addWall);
-	if (line == startNode.col || line == finishNode.col) return getWallX(width, startNode, finishNode);
-	else return line;
+	const spot = getSpot(width - addWall);
+	if (spot === startNode.col || spot === finishNode.col) return getX(width, startNode, finishNode, isWall);
+	else return spot;
 }
 
 function getY(height, startNode, finishNode, isWall) {
 	const addWall = isWall ? 2 : 0;
-	const line = getWall(height - addWall);
-	if (line == startNode.row || line == finishNode.row) return getWallY(height, startNode, finishNode);
-	else return line;
+	const spot = getSpot(height - addWall);
+	if (spot === startNode.row || spot === finishNode.row) return getY(height, startNode, finishNode, isWall);
+	else return spot;
 }
 
-function getWall(measure) {
+function getSpot(measure) {
 	return Math.floor((measure) * Math.random());
 }
 
-function divide(grid, x, y, width, height, orientation, startNode, finishNode) {
+function divide(grid, x, y, width, height, orientation, startNode, finishNode, walls) {
 	if (width < 2 || height < 2) return;
-  	const horizontal = orientation;
+  	const isHorizontal = orientation;
 
-   	// where will the wall be drawn from?
-  	const wx = x + (horizontal ? 0 : getX(width, startNode, finishNode, true));
-  	const wy = y + (horizontal ? getY(height, startNode, finishNode, true) : 0);
+  	let wx = x + (isHorizontal ? 0 : getX(width, startNode, finishNode, true));
+  	let wy = y + (isHorizontal ? getY(height, startNode, finishNode, true) : 0);
 
-    // where will the passage through the wall exist?
-  	const px = wx + (horizontal ? getX(width, startNode, finishNode, false) : 0);
-  	const py = wy + (horizontal ? 0 : getY(height, startNode, finishNode, false));
+  	const px = wx + (isHorizontal ? getX(width, startNode, finishNode, false) : 0);
+  	const py = wy + (isHorizontal ? 0 : getY(height, startNode, finishNode, false));
 
-  	// what direction will the wall be drawn?
-  	const dx = horizontal ? 1 : 0;
-  	const dy = horizontal ? 0 : 1;
+  	const dx = isHorizontal ? 1 : 0;
+  	const dy = isHorizontal ? 0 : 1;
 
-  	// how long will the wall be?
-  	const length = horizontal ? width : height
-
-  	// what direction is perpendicular to the wall?
-  	const dir = horizontal ? "S" : "E"
+  	const length = isHorizontal ? width : height;
 
   	for (let i = 0; i < length; i++) {
-  		if ((wx != px) || (wy != py)) grid[wy][wx] |= dir 
-    	wx += dx
-    	wy += dy
+  		if ((wx !== px) || (wy !== py)) {
+  			const node = grid[wy][wx];
+  			if (!node.isStart && !node.isFinish) {
+  				node.isWall = true;
+  				walls.push(node);
+  			}
+  		}
+    	wx += dx;
+    	wy += dy;
 	}
-  nx, ny = x, y
-  w, h = horizontal ? [width, wy-y+1] : [wx-x+1, height]
-  divide(grid, nx, ny, w, h, choose_orientation(w, h))
+	let [nx, ny] = [x, y];
 
-  nx, ny = horizontal ? [x, wy+1] : [wx+1, y]
-  w, h = horizontal ? [width, y+height-wy-1] : [x+width-wx-1, height]
-  divide(grid, nx, ny, w, h, choose_orientation(w, h))
+	let [w, h] = isHorizontal ? [width, wy - y] : [wx - x, height];
+	divide(grid, nx, ny, w, h, choose_orientation(w, h), startNode, finishNode, walls);
 
-
+	[nx, ny] = isHorizontal ? [x, wy + 2] : [wx + 2, y];
+	[w, h] = isHorizontal ? [width, y - 2 + height - wy] : [x - 2 + width - wx, height];
+	divide(grid, nx, ny, w, h, choose_orientation(w, h), startNode, finishNode, walls);
 }
 
 function choose_orientation(width, height) {
@@ -82,8 +76,5 @@ function choose_orientation(width, height) {
   else if (height < width)
     return false;
   else
-    return Math.floor(2 * Math.random()) == 0;
+    return Math.floor(2 * Math.random()) === 0;
 }
-
-def divide(grid, x, y, width, height, orientation)
-end

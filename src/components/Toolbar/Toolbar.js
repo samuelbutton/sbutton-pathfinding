@@ -27,10 +27,11 @@ const toolbar = props => (
 						
 					<li><button  className="vizButton" onClick={props.vizClickHandler}>Visualize!</button></li>
 					<li><button  className="clearButton" onClick={props.clearClickHandler}>Clear Visualization</button></li>
+					<li><button  className="clearButton" onClick={props.mazeHandler}>Generate Maze</button></li>
 				</ul>
 			</div>
 			<div className="spacer" />
-			<a href="https://github.com/scbutton95/sbutton-pathfinding" class="button
+			<a href="https://github.com/scbutton95/sbutton-pathfinding" className="button
       github-button">View on Github</a>
 		</nav>
 	</header>

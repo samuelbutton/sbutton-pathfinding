@@ -8,6 +8,7 @@ import {bfs} from '../../algorithms/bfs';
 import {aStar} from '../../algorithms/aStar';
 import {bidirectional} from '../../algorithms/bidirectionalBfs';
 import {bestFirst} from '../../algorithms/bestFirst';
+import {maze} from '../../algorithms/maze';
 
 import './PathfindingVisualizer.css';
 
@@ -295,6 +296,61 @@ export default class PathfindingVisualizer extends Component {
   guideCloseHandler = () => {
     this.setState({showGuideBox: false});
   };
+  async generateMaze() {
+    if (this.state.visualizationRunning) return;
+    this.clearVisualization(true, true);
+    for (let i = 0; i < 1; i++) {
+      let numberOfRows = Math.floor((window.innerHeight-100)/NODE_HEIGHT);
+      let numberOfCols = Math.floor((window.innerWidth-60)/NODE_WIDTH);
+      const grid = await getNewGrid([], numberOfRows, numberOfCols);
+      
+      const [newGrid, walls] = await maze(grid.slice(), this.state.startNode, this.state.finishNode);
+      
+      for (let i = 0; i < newGrid.length; i++) {
+        for (let j = 0; j < newGrid[0].length; j++) {
+           if (i > 1 && j > 1 && i < grid.length - 2 && j < grid[0].length - 2) {
+             if (newGrid[i+1][j].isWall && newGrid[i-1][j].isWall && !newGrid[i][j].isWall) {
+               newGrid[i][j-1].isWall = false;
+                newGrid[i][j+1].isWall = false;
+             }
+             if (newGrid[i][j+1].isWall && newGrid[i][j-1].isWall && !newGrid[i][j].isWall) {
+               newGrid[i-1][j].isWall = false;
+                newGrid[i+1][j].isWall = false;
+             }
+           }
+        }
+      }
+      const [startNode, finishNode] = this.getEndNodes(newGrid, numberOfRows, numberOfCols);
+
+      let delay = 20;
+      await this.lockInteractions();
+      await this.animateMaze(walls, delay, "node node-wall");
+
+      setTimeout(() => {
+           this.setState({ 
+            grid: newGrid,
+            numberOfRows,
+            numberOfCols,
+            startNode,
+            finishNode
+          });
+           this.unlockInteractions();
+      }, delay * walls.length);
+
+      
+    }
+  }
+
+   animateMaze(walls, delay, classname) {
+
+    let i = 0;
+    for (const node of walls) {
+      setTimeout(() => {
+         if (node.isWall)
+           document.getElementById(`node-${node.row}-${node.col}`).className = classname;
+      }, delay * i++);
+    }
+  }
 
   render() {
     const {grid, mouseIsPressed, showAlertBox, showGuideBox} = this.state;
@@ -379,3 +435,4 @@ const getShortestPathOrder = (finishNode) => {
   }
   return nodesInShortestPathOrder;
 }
+

@@ -25,6 +25,7 @@ const sideDrawer = props => {
 				</li>
 				<li><button onClick={props.vizClickHandler}>Visualize!</button></li>
 				<li><button onClick={props.clearClickHandler}>Clear Visualization</button></li>
+				<li><button onClick={props.mazeHandler}>Generate Maze</button></li>
 			</ul>
 		</nav>
 	);
