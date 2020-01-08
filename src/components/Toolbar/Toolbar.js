@@ -31,7 +31,7 @@ const toolbar = props => (
 				</ul>
 			</div>
 			<div className="spacer" />
-			<a href="https://github.com/scbutton95/sbutton-pathfinding" className="button
+			<a href="https://github.com/samuelbutton/sbutton-pathfinding" className="button
       github-button">View on Github</a>
 		</nav>
 	</header>
